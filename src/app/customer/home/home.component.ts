@@ -33,13 +33,6 @@ export class HomeComponent implements AfterViewInit {
   }
 
   customers: customer[] = [];
-
-  customerr: customer = {
-    id: 0,
-    name: "",
-    email: "",
-    password: ""
-  }
   addCustomer(customer: customer) {
     this.custservice.createCustomer(customer).subscribe(() => {
       this.loadCustomers();
@@ -64,14 +57,15 @@ export class HomeComponent implements AfterViewInit {
       this.loadCustomers();
     });
   }
-
-  deleteCustomer(id: number) {
+  deleteCustomer(customer: customer) {
     if (confirm('Are you sure you want to delete this customer?')) {
-      this.custservice.deleteCustomer(id).subscribe(() => {
-        this.customers = this.customers.filter(c => c.id !== id); // Remove from array
-        this.dataSource = new MatTableDataSource<customer>(this.customers); // Update table
+      this.custservice.deleteCustomer(customer.id).subscribe(() => {
+        this.customers = this.customers.filter(c => c.id !== customer.id); // ✅ Remove deleted customer from array
+        this.dataSource.data = this.customers; // ✅ Update table
+        this.loadCustomers();
+
       });
     }
   }
-  
+   
 }
