@@ -23,6 +23,7 @@ export class HomeComponent implements AfterViewInit {
   constructor(private custservice: CustomerService, public dialog: MatDialog) { }
   ngAfterViewInit(): void {
     this.loadCustomers();
+    this.loaddeletedcustomers();
   }
 
   loadCustomers(): void {
@@ -31,7 +32,14 @@ export class HomeComponent implements AfterViewInit {
       this.dataSource = new MatTableDataSource<customer>(data);
     });
   }
+deletedCust:customer[]=[];
+  loaddeletedcustomers(){
+    this.custservice.fetchdeletedcust().subscribe((data)=>{
+    this.deletedCust=data;
+         this.loadCustomers();
 
+    })
+  }
   customers: customer[] = [];
   addCustomer(customer: customer) {
     this.custservice.createCustomer(customer).subscribe(() => {
@@ -62,10 +70,22 @@ export class HomeComponent implements AfterViewInit {
       this.custservice.deleteCustomer(customer.id).subscribe(() => {
         this.customers = this.customers.filter(c => c.id !== customer.id); // ✅ Remove deleted customer from array
         this.dataSource.data = this.customers; // ✅ Update table
-        this.loadCustomers();
+        //this.loadCustomers();
 
       });
     }
   }
+ softDeleteCust(customer:customer){
+ this.custservice.softdelete(customer.id).subscribe((result:any)=>{
+ this.loadCustomers();
+ })
+ }
+
+ restoreCust(customer:customer){
+  this.custservice.restore(customer.id).subscribe((result:any)=>{
+     this.loadCustomers();
+     })
+
+ }
    
 }
